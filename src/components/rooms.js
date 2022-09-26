@@ -1,10 +1,51 @@
 import React from "react";
+import { useState,useEffect } from "react";
 import Top from "./top";
 import '../css/rooms.css'
 import SliderProton from "./slideproton";
-import image from '../assets/bedroom1.jpg'
+import image from '../assets/bedroom1.jpg';
+import { getDocs , getDoc, collection, doc, addDoc} from "firebase/firestore";
+import { db } from "../config/firebase";
+import { async } from "@firebase/util";
+import { type } from "@testing-library/user-event/dist/type";
+
 
 function Booking(){
+
+    const [items, setItems] = useState([]);
+    
+    const [price, setPrice] = useState('');
+    const [types, setTypes] = useState('');
+
+
+    const itemsref = collection(db,"addRoom");
+    const refBooking = collection(db, "Booking")
+
+
+    const getItems = async () =>{
+        let data = await getDocs(itemsref);
+        setItems(data.docs.map((doc)=>({...doc.data(),id: doc.id})))
+
+    }
+    items.map( item => {
+        console.log(item);
+    })
+    const addBooking =async(obj) => {
+        console.log(obj);
+
+        await addDoc(refBooking,{price: obj.price,types: obj.types});
+
+        alert("added");
+        getItems();
+    }
+
+    useEffect(()=>{
+    getItems();
+    },[])
+
+
+
+
     return(
         <div className="booking">
             <Top/>
@@ -53,12 +94,15 @@ function Booking(){
             </div>
             <div className="room-block">
                 <h2 className="the-rooms">Price Range</h2>
-                    <div className="book-rooms">
+
+                {items.map(item=> 
+                    
+                    <div className="book-rooms" key ={item.id}>
                         <div className="down">
                             <img src={image} className="the-image"/>
                             <div className="top-part">
-                                <h3>price</h3>
-                                <h3>type</h3>
+                                <h3 >{item.price}</h3>
+                                <h3>{item.types}</h3>
                                 
                             </div>
                             <p>ex ea commodo consequat. Duis aute irure 
@@ -67,48 +111,14 @@ function Booking(){
                                 cupidatat non proident,</p>
                             <div className="buttons">
                                 <button>view</button>
-                                <button>Book Now</button>
+                                <button onClick={() => addBooking(item)}>Book Now</button>
                             </div>
                             
                         </div>
 
-                        <div className="down">
-                            <img src={image} className="the-image"/>
-                            <div className="top-part">
-                                <h3>price</h3>
-                                <h3>type</h3>
-                                
-                            </div>
-                            <p>ex ea commodo consequat. Duis aute irure 
-                                dolor in reprehenderit in voluptate velit esse cillum 
-                                dolore eu fugiat nulla pariatur. Excepteur sint occaecat 
-                                cupidatat non proident,</p>
-                            <div className="buttons">
-                                <button>view</button>
-                                <button>Book Now</button>
-                            </div>
-                            
-                        </div>
-
-                        <div className="down">
-                            <img src={image} className="the-image"/>
-                            <div className="top-part">
-                                <h3>price</h3>
-                                <h3>type</h3>
-                                
-                            </div>
-                            <p>ex ea commodo consequat. Duis aute irure 
-                                dolor in reprehenderit in voluptate velit esse cillum 
-                                dolore eu fugiat nulla pariatur. Excepteur sint occaecat 
-                                cupidatat non proident,</p>
-                            <div className="buttons">
-                                <button>view</button>
-                                <button>Book Now</button>
-                            </div>
-                            
-                        </div>
-                    </div>
                         
+                    </div>
+            )}      
             </div>
         </div>
     )
